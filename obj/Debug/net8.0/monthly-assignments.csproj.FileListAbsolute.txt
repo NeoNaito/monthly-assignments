@@ -1,0 +1,15 @@
+d:\work\1SB-3G\monthly-assignments\bin\Debug\net8.0\monthly-assignments.exe
+d:\work\1SB-3G\monthly-assignments\bin\Debug\net8.0\monthly-assignments.deps.json
+d:\work\1SB-3G\monthly-assignments\bin\Debug\net8.0\monthly-assignments.runtimeconfig.json
+d:\work\1SB-3G\monthly-assignments\bin\Debug\net8.0\monthly-assignments.dll
+d:\work\1SB-3G\monthly-assignments\bin\Debug\net8.0\monthly-assignments.pdb
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.GeneratedMSBuildEditorConfig.editorconfig
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.AssemblyInfoInputs.cache
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.AssemblyInfo.cs
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.csproj.CoreCompileInputs.cache
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.sourcelink.json
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.dll
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\refint\monthly-assignments.dll
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.pdb
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\monthly-assignments.genruntimeconfig.cache
+d:\work\1SB-3G\monthly-assignments\obj\Debug\net8.0\ref\monthly-assignments.dll
