@@ -4,7 +4,7 @@ namespace monthly_assignments;
 
 class ProgramC
 {
-    static void Main(string[] args)
+    static void MainC(string[] args)
     {
         // 長さ、要素番号を取得
         var input = Console.ReadLine() ?? "";
