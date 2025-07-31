@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>パスキー登録・認証サンプル</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; margin: 2em; }
+    input, button { margin: 0.5em 0; }
+    .result { margin-top: 1em; color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>パスキー登録・認証サンプル</h1>
+  <section>
+    <h2>パスキー登録</h2>
+    <button id="registerBtn">登録</button>
+    <div id="registerResult" class="result"></div>
+  </section>
+  <script type="module">
+    
+    // Base64URL文字列をArrayBufferに変換する関数
+    // RPサーバーから受け取った challenge などをAPIに渡す前に使用します。
+    function base64urlToArrayBuffer(base64url) {
+        const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+        const raw = window.atob(base64);
+        const buffer = new Uint8Array(raw.length);
+        for (let i = 0; i < raw.length; i++) {
+            buffer[i] = raw.charCodeAt(i);
+        }
+        return buffer.buffer;
+    }
+
+    // ArrayBufferをBase64URL文字列に変換する関数
+    // APIから受け取った id や response などをRPサーバーに送信する前に使用します。
+    function arrayBufferToBase64url(buffer) {
+        const bytes = new Uint8Array(buffer);
+        let str = '';
+        for (const charCode of bytes) {
+            str += String.fromCharCode(charCode);
+        }
+        const base64 = window.btoa(str);
+        return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    // DWH連携ファイルにレコードを出力する関数
+    async function outputDwhRecord(funcId, procId, procType, procDetail, authType) {
+      const response = await fetch('/dwh/outputrecord.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          funcId: funcId,
+          procId: procId,
+          procType: procType,
+          procDetail: procDetail,
+          authType: authType
+        })
+      });
+    }
+
+    // 登録ボタン押下
+    document.getElementById('registerBtn').onclick = async () => {
+      document.getElementById('registerResult').textContent = '';
+      try {
+        // WebAuthn APIのサポート確認
+        if (!window.PublicKeyCredential || !PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+          // ブラウザがWebAuthn APIをサポートしていない場合
+          /* パスキー未対応画面に遷移 */
+          return;
+        }
+        if (!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) {
+          // プラットフォーム認証器が利用可能でない場合
+          /* パスキー未対応画面に遷移 */
+          return;
+        }
+
+        // サーバーからpublicKeyオブジェクトを取得
+        const optionsResponse = await fetch('/webauthn/register/options', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!optionsResponse.ok) {
+          // サーバーからエラーが返却された場合
+          /* エラー処理 */
+          return;
+        }
+
+        // パスキー登録パラメータの作成
+        const options = await optionsResponse.json();
+        const publicKey = {
+          challenge: base64urlToArrayBuffer(options.publicKey.challenge),
+          rp: {
+            id: options.publicKey.rp.id,
+            name: options.publicKey.rp.name 
+          },
+          user: {
+            id: base64urlToArrayBuffer(options.publicKey.user.id),
+            name: options.publicKey.user.name,
+            displayName: options.publicKey.user.displayName
+          },
+          pubKeyCredParams: options.publicKey.pubKeyCredParams,
+          excludeCredentials: options.publicKey.excludeCredentials ? options.publicKey.excludeCredentials.map(cred => ({
+            id: base64urlToArrayBuffer(cred.id),
+            type: cred.type
+          })) : [],
+          authenticatorSelection: options.publicKey.authenticatorSelection,
+          attestation: options.publicKey.attestation,
+          timeout: options.publicKey.timeout
+        };
+        // navigator.credentials.createでパスキー生成
+        let credential = await navigator.credentials.create({ publicKey });
+
+        // サーバーに送信
+        const resultResponse = await fetch('/webauthn/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credential)
+        });
+        
+        if (!resultResponse.ok) {
+          // サーバーからエラーが返却された場合
+          /* エラー処理 */
+          return;
+        }
+
+        /* 登録完了画面に遷移 */
+        window.location.href = '/authenticate.html';
+
+      } catch (e) {
+
+        // js側エラーハンドリング
+        if (e.name === "NotAllowedError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "InvalidStateError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "ConstraintError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "SecurityError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "AbortError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "UnknownError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "NotSupportedError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+        if (e.name === "TypeError") {
+          /* エラー処理 */
+          outputDwhRecord("sampleFuncId", "sampleProcId", "sampleProcType", "sampleProcDetail", "sampleAuthType");
+        }
+
+        /* エラー内容を画面に表示 */
+      }
+    };
+  </script>
+</body>
+</html>
